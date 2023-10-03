@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #chatbot-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        #chatbot-body {
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #chatbot-input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: none;
+            border-top: 1px solid #ccc;
+            outline: none;
+        }
+        #chatbot-send {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chatbot-container">
+    <div id="chatbot-header">Chatbot</div>
+    <div id="chatbot-body"></div>
+    <input type="text" id="chatbot-input" placeholder="Type your message...">
+    <button id="chatbot-send">Send</button>
+</div>
+
+<script>
+    const chatbotContainer = document.getElementById('chatbot-container');
+    const chatbotHeader = document.getElementById('chatbot-header');
+    const chatbotBody = document.getElementById('chatbot-body');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotSend = document.getElementById('chatbot-send');
+
+    chatbotHeader.addEventListener('click', () => {
+        chatbotContainer.classList.toggle('open');
+    });
+
+    chatbotSend.addEventListener('click', () => {
+        const userMessage = chatbotInput.value;
+        if (userMessage.trim() === '') return;
+
+        displayMessage(userMessage, 'user');
+        callApi(userMessage)
+            .then(response => {
+                displayMessage(response, 'chatbot');
+            })
+            .catch(error => {
+                displayMessage('Error fetching response.', 'chatbot');
+            });
+
+        chatbotInput.value = '';
+    });
+
+    function displayMessage(message, sender) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', sender);
+        messageElement.textContent = message;
+        chatbotBody.appendChild(messageElement);
+        chatbotBody.scrollTop = chatbotBody.scrollHeight;
+    }
+
+    function callApi(message) {
+        const apiUrl = 'http://3.22.194.121/chat'; // Assuming your Flask API is running on the same domain
+
+        return fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message }),
+        })
+            .then(response => response.json())
+            .then(data => data.response)
+            .catch(error => {
+                throw new Error('Error calling API');
+            });
+    }
+</script>
+
+</body>
+</html>
