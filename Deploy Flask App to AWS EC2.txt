@@ -1,0 +1,52 @@
+1- Create an EC2 Instance
+2- Open it in terminal
+
+3- sudo apt-get update or sudo apt update
+4- sudo apt-get install python3
+5- sudo apt-get install python3-pip
+6- sudo pip install (your package)
+
+7- sudo apt-get install nginx 
+8- sudo apt-get install gunicorn3
+9- mkdir flaskapp
+10- cd flaskapp
+11- python3 app.py 
+12- sudo nano /etc/nginx/sites-enabled/flaskapp
+
+paste the below code and remember port should be 8000 in your app.py for digital ocean:
+
+server {
+    listen 80;
+    server_name 3.22.194.121;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+    }
+  }
+
+but change the ip address according to your public ip of ec2 or droplet
+
+13- sudo service nginx restart
+14- gunicorn3 app:app
+15- Run permanently : gunicorn3 app:app --daemon
+
+
+Note: If you update your code then restart the nginx server and run gunicorn again. In other words, run two below commands
+
+- ps aux | grep gunicorn
+- Copy the gunicorn port from above and kill it with below command:
+   kill port_number
+- Check again port is stopped or not: ps aux | grep gunicorn
+- sudo service nginx restart
+- Run the app again: gunicorn3 app:app --daemon
+
+NOTE: IF YOUR SERVER PROCESS REQUEST FOR MORE THAN 30 SECONDS, THEN USE THE --tiemout flag while start the gunicorn server
+
+Example: gunicorn --timeout 120 app:app --daemon
+
+Above all comments are written based on below video:
+https://www.youtube.com/watch?v=MAsp90tQGOA
+
+If you want to connect domain with aws ec2 then follow below tutorial:
+https://www.youtube.com/watch?v=6Rcp4x_Y1Bk.
+
